@@ -42,6 +42,10 @@ try {
 
 outDir.Create();
 
+if (options.ModPaths == null) {
+	options.ModPaths = [];
+}
+
 bool hasMods = options.ModPaths.Count > 0;
 List<WorkspaceDirectoryInput> resourceDirs = [
 	WorkspaceDirectoryInput.NewWD(new WorkspaceDirectory(
