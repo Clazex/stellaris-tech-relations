@@ -261,7 +261,12 @@ foreach ((string id, Tech tech) in techs) {
 				}
 
 				if (!loc.TryGetValue(swapKey, out Lazy<string>? desc)) {
-					desc = loc[key];
+					try {
+						desc = loc[key];
+					} catch (KeyNotFoundException) {
+						Console.WriteLine($"[Warning] The given key '{key}' was not present in the dictionary, skip it.");
+						desc = new Lazy<string>(key);
+					}
 				}
 
 				string descVal = desc.Value;
@@ -421,8 +426,13 @@ public class Tech(
 
 		Tech tech = new(vanilla, area, tier, categories, levels, dangerous, rare, requires, []);
 		foreach (CWNode swapNode in node.Childs("technology_swap")) {
-			tech.Swaps[swapNode.Tag("name").Value.ToRawString()]
-				= TechSwap.Parse(swapNode, cwComparer, tech);
+			try {
+				tech.Swaps[swapNode.Tag("name").Value.ToRawString()] = TechSwap.Parse(swapNode, cwComparer, tech);
+			} catch (NullReferenceException) {
+				Console.WriteLine($"[Warning]: cannot read node {node.Key}'s swapNode.Tag('name'), skip it.");
+				continue;
+			}
+
 		}
 
 		return tech;
